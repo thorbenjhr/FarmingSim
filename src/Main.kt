@@ -22,10 +22,9 @@ fun main() {
 
     sim.start()
 
-    /*val n = Coordinate(5, 5).getNeighbours(2)
+    val n = Coordinate(5, 5).getNeighbours(2)
     println("Size: ${n.size}")
     n.forEach { c -> println("Coordinate ${c.getX()}, ${c.getY()}") }
-     */
 }
 
 fun test2() {

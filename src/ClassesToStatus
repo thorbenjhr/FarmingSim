@@ -4,7 +4,7 @@ Main
 Simulation                  DONE
 
 PACKAGE LAYOUT
-Map                         getTileByIdAndDirection
+Map                         DONE
 Tile                        NeedsAction, Setters, Setters
 Coordinate                  DONE
 
