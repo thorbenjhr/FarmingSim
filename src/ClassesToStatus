@@ -1,7 +1,7 @@
 Overall missing: Getters, Setters, Constants class
 
 Main
-Simulation
+Simulation                  DONE
 
 PACKAGE LAYOUT
 Map                         getTileByIdAndDirection

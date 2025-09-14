@@ -1,5 +1,6 @@
 package environmental
 
+import Constants
 import layout.MapClass
 import kotlin.math.min
 
@@ -26,8 +27,8 @@ class CloudManager(private var map: MapClass, private var clouds: MutableMap<Int
         val cloudOnTile = clouds[onTileId]
         val cloudMoving = clouds[movingId]
         val c = Cloud(clouds.keys.max() + 1, cloudOnTile!!.getLocation(), min(cloudOnTile.getDuration(), cloudMoving!!.getDuration()), cloudOnTile.getAmount() + cloudMoving.getAmount())
-        // fix how many moves it can make
-        return Pair(0, c)
+        val moves = min(movesLeft, Constants.MAX_MOVE_PER_TICK)
+        return Pair(moves, c)
     }
 
     fun addCloud(cloud: Cloud) {
