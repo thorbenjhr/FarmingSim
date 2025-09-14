@@ -1,5 +1,6 @@
 package layout
 
+import enums.Direction
 import kotlin.math.abs
 
 data class Coordinate(private val x: Int, private val y: Int) {
@@ -9,17 +10,11 @@ data class Coordinate(private val x: Int, private val y: Int) {
 
     private fun getNeighbours(): List<Coordinate> {
         val n = if (abs(x % 2) == 1) { // square
-            listOf(
-                Pair(-1, -1), Pair(1, -1), Pair(-1, 1), Pair(1, 1)
-            )
+            Direction.entries.filter { it.square }
         } else { // octagonal
-            listOf(
-                Pair(0, -2), Pair(1, -1), Pair(2, 0), Pair(1, 1), Pair(0, 2), Pair(-1 ,1), Pair(-2, 0), Pair(-1, -1)
-            )
+            Direction.entries
         }
-
-        // has neighbours and exist
-        return n.map { (dx, dy) -> (Coordinate(x + dx, y + dy)) }
+        return n.map { dir -> Coordinate(x + dir.dx, y + dir.dy) }
     }
 
     fun getNeighbours(radius: Int = 1): List<Coordinate> {

@@ -12,6 +12,9 @@ class MapClass (private val tiles: Map<Int, Tile>, private val tilesCoordinates:
     }
 
     fun getTileByIdAndDirection(idx: Int, direction: Direction): Tile? {
-        TODO()
+        val tile = tiles[idx]?: return null
+        val coordinates = tile.getCoordinates()
+        val targetCoordinates = Coordinate(coordinates.getX() + direction.dx, coordinates.getY() + direction.dy)
+        return tilesCoordinates[targetCoordinates]
     }
 }
