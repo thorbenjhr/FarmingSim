@@ -8,8 +8,9 @@ class Environment(private var currentSoilMoisture: Int, private var capacity: In
     private var beeHappyEvents: Double = 1.0
     private var animalAttack: Boolean = false
 
-    fun updateSoil(hasPlant: Boolean) {
+    fun updateSoil(hasPlant: Boolean, threshold: Int): Boolean {
         currentSoilMoisture = if (hasPlant) max(currentSoilMoisture - Constants.SOIL_REDUCTION_PLANT, 0)
         else max(currentSoilMoisture - Constants.SOIL_REDUCTION_NO_PLANT, 0)
+        return currentSoilMoisture >= threshold
     }
 }

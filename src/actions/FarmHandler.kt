@@ -5,8 +5,30 @@ import enums.Action
 
 class FarmHandler(private val bfs: Bfs) {
     fun reduceMoisture(farms: Map<Int, Farm>): Pair<Int, Int> {
-        // TODO()
-    return Pair(Constants.NO_VALUE, Constants.NO_VALUE)
+        var fields = 0
+        var plantations = 0
+        farms.toSortedMap().values.forEach { farm ->
+            farm.getFields().values.forEach { tile ->
+                val plant = tile.getPlant()
+                val threshold = plant?.getType()?.getSpec()?.getRequiredMoisture()
+                val env = tile.getEnvironment()
+                val aboveThreshold = env!!.updateSoil(plant != null, threshold!!)
+                if (!aboveThreshold) {
+                    fields++
+                }
+            }
+
+            farm.getPlantations().values.forEach { tile ->
+                val plant = tile.getPlant()
+                val threshold = plant?.getType()?.getSpec()?.getRequiredMoisture()
+                val env = tile.getEnvironment()
+                val aboveThreshold = env!!.updateSoil(plant != null, threshold!!)
+                if (!aboveThreshold) {
+                    plantations++
+                }
+            }
+        }
+        return Pair(fields, plantations)
     }
 
     fun performActions(farms: Map<Int, Farm>, currentTick: Int, yearTick: Int) {

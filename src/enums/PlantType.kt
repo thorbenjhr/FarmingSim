@@ -10,5 +10,7 @@ enum class PlantType(private val spec: PlantSpec) {
     APPLE(PlantSpec()),
     ALMOND(PlantSpec()),
     CHERRY(PlantSpec()),
-    GRAPE(PlantSpec())
+    GRAPE(PlantSpec());
+
+    fun getSpec() = spec
 }
