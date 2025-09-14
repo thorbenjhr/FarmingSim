@@ -1,0 +1,48 @@
+Overall missing: Getters, Setters, Constants class
+
+Main
+Simulation
+
+PACKAGE LAYOUT
+Map                         getTileByIdAndDirection
+Tile                        NeedsAction, Setters, Setters
+Coordinate                  DONE
+
+PACKAGE ENUMS
+PlantType                   Missing PlantSpec
+Action                      DONE
+Direction                   DONE
+TileType                    DONE
+IncidentType                DONE
+
+PACKAGE ACTIONS
+FarmHandler
+Task                        Getters, Setters
+Farm                        Getters, Setters
+Bfs                         DONE
+SowingPlan                  Getters, Setters
+Machine                     Getters, Setters
+
+PACKAGE LOGGING
+Logger                      functions that take lists instead of single vals
+
+PACKAGE PARSER
+ObjectCreator
+Accumulator
+MapJSONParser
+FarmsJSONParser
+ScenarioJSONParser
+
+PACKAGE ENVIRONMENTAL
+Environment                 Getters, Setters
+CloudManager
+Cloud                       DONE
+
+PACKAGE INCIDENTS
+IncidentManager
+Incident                    Getters, Setters
+
+PACKAGE HARVESTING
+HarvestEstimator
+PlantSpec
+Plant                       Getters, Setters

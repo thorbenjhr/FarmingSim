@@ -1,0 +1,4 @@
+package harvesting
+
+class PlantSpec {
+}
