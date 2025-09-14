@@ -10,17 +10,17 @@ class Simulation (private val m: MapClass, private val farms: Map<Int, Farm>, pr
     private var currentTick = Constants.NO_VALUE
     fun start() {
         Logger.logSimulationStart(yearTick)
-        if (currentTick == maxTick) {
-            Logger.logSimulationEnded(maxTick)
-            return
-        }
-
         while (currentTick < maxTick) {
             tick()
             currentTick++
             yearTick++
             // keep yearTick in 1..24
             yearTick = ((yearTick - 1) % 24 + 24) % 24 + 1
+        }
+
+        if (currentTick == maxTick) {
+            Logger.logSimulationEnded(maxTick)
+            harvestEstimator.logSimulationStatistics()
         }
     }
 
@@ -34,22 +34,23 @@ class Simulation (private val m: MapClass, private val farms: Map<Int, Farm>, pr
     }
 
     private fun reduceSoilMoisture() {
-        // TODO()
+        val (fields, plantations) = farmHandler.reduceMoisture(farms)
+        Logger.logSoilMoistureBelowThreshold(fields, plantations)
     }
 
     private fun moveClouds() {
-        // TODO()
+        cm.applyMoves()
     }
 
     private fun assignActionsAndPerform() {
-        // TODO()
+        farmHandler.performActions(farms, currentTick, yearTick)
     }
 
     private fun startAndEndIncidents() {
-        // TODO()
+        incidentManager.handleIncidents(currentTick, cm, m, farms)
     }
 
     private fun computeHarvestEstimate() {
-        // TODO()
+        harvestEstimator.computeAllTiles(yearTick, farms)
     }
 }

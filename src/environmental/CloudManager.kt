@@ -11,7 +11,7 @@ class CloudManager(private var map: MapClass, private var clouds: MutableMap<Int
     }
 
     private fun computeNextLocations(id: Int) {
-        TODO()
+        // TODO()
     }
 
     private fun applyRain(id: Int) {

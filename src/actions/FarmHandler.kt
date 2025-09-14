@@ -1,14 +1,15 @@
 package actions
 
+import Constants
 import enums.Action
 
 class FarmHandler(private val bfs: Bfs) {
     fun reduceMoisture(farms: Map<Int, Farm>): Pair<Int, Int> {
-        TODO()
+        // TODO()
+    return Pair(Constants.NO_VALUE, Constants.NO_VALUE)
     }
 
     fun performActions(farms: Map<Int, Farm>, currentTick: Int, yearTick: Int) {
-        TODO()
     }
 
     private fun gatherAndSchedule(currentTick: Int, yearTick: Int) {
