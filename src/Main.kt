@@ -1,5 +1,6 @@
 import actions.Bfs
 import actions.FarmHandler
+import enums.Direction
 import enums.TileType
 import environmental.CloudManager
 import harvesting.HarvestEstimator
@@ -84,6 +85,22 @@ fun test2() {
     // BFS from id 9 to id 13 with harvest expect false
     val p2 = bfs.findPath(9, 13, 5, true)
     println("Path from id 9 to id 13 with harvest: $p2")
+
+    // expect null since it is square
+    val tid1 = mapMap.getTileByIdAndDirection(3, Direction.NORTH)
+    if (tid1 != null) {
+        println(tid1.getId())
+    } else {
+        println("NULL")
+    }
+
+    // expect 6
+    val tid2 = mapMap.getTileByIdAndDirection(3, Direction.SOUTHEAST)
+    if (tid2 != null) {
+        println(tid2.getId())
+    } else {
+        println("NULL")
+    }
 }
 
 fun test1() {
