@@ -8,6 +8,7 @@ import enums.TileType
 import environmental.Cloud
 import environmental.CloudManager
 import layout.MapClass
+import logging.Logger
 import kotlin.math.max
 
 class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
@@ -23,6 +24,8 @@ class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
                 IncidentType.CITYEXPANSION -> applyCityExpansion(incident, m, farms)
                 IncidentType.ANIMALATTACK -> applyAnimalAttack(incident, m)
             }
+            // fix tiles
+            Logger.logIncident(incident.getId(), incident.getType().toString(), emptyList())
         }
     }
 
