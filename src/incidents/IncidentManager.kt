@@ -20,7 +20,7 @@ class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
                 IncidentType.DROUGHT -> applyDrought(incident, m, farms, tick)
                 IncidentType.BROKENMACHNINE -> applyBrokenMachine(incident, farms, tick)
                 IncidentType.CITYEXPANSION -> applyCityExpansion(incident, m, farms)
-                IncidentType.ANIMALATTACK -> applyAnimalAttack()
+                IncidentType.ANIMALATTACK -> applyAnimalAttack(incident, m)
             }
         }
     }
@@ -38,14 +38,14 @@ class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
         val tile = m.getTileByIndex(incident.getLocation())
         val coord = tile?.getCoordinates()
         val neighboursCoord = coord?.getNeighbours(incident.getRadius())
-        val affectedTiles = neighboursCoord?.mapNotNull { m.getTileByCoordinates(it) }?.filter { it.getType() == TileType.PLANTATION || it.getType() == TileType.FIELD }
+        val affectedTiles = neighboursCoord?.distinct()?.mapNotNull { m.getTileByCoordinates(it) }?.filter { it.getType() == TileType.PLANTATION || it.getType() == TileType.FIELD }
         affectedTiles?.forEach { t ->
             t.getEnvironment()?.setSoilMoisture(Constants.NO_VALUE)
             t.setHarvestEstimate(Constants.NO_VALUE)
             t.setPlant(null)
             if (t.getType() == TileType.PLANTATION) {
                 t.setDead(true)
-                farms[t.getFarmId()]?.getFields()?.remove(t.getId())
+                farms[t.getFarmId()]?.getPlantations()?.remove(t.getId())
             } else {
                 t.setFallowPeriodOver(tick + Constants.FALLOW_PERIOD_TICKS + 1)
             }
@@ -72,7 +72,15 @@ class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
         tile.setTileType(TileType.VILLAGE)
     }
 
-    private fun applyAnimalAttack() {
-        TODO()
+    private fun applyAnimalAttack(incident: Incident, m: MapClass) {
+        val tile = m.getTileByIndex(incident.getLocation())
+        val coord = tile?.getCoordinates()
+        val neighboursCoord = coord?.getNeighbours(incident.getRadius())
+        val affectedTiles = neighboursCoord?.distinct()?.mapNotNull { m.getTileByCoordinates(it) }?.filter { it.getType() == TileType.FOREST }
+        affectedTiles?.forEach { t ->
+            val tileNeighbours = t.getCoordinates().getNeighbours()
+            val tileNeighboursFiltered = tileNeighbours.mapNotNull { m.getTileByCoordinates(it) }.filter { it.getType() == TileType.FIELD || it.getType() == TileType.PLANTATION }
+
+        }
     }
 }
