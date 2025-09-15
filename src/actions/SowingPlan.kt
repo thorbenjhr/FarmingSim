@@ -12,4 +12,11 @@ data class SowingPlan(
 ) {
     constructor(id: Int, tick: Int, plant: Plant, fields: List<Int>): this(id, tick, plant, fields, null, null)
     constructor(id: Int, tick: Int, plant: Plant, location: Int, radius: Int): this(id, tick, plant, emptyList(), location, radius)
+
+    fun getId() = id
+    fun getTick() = tick
+    fun getPlant() = plant
+    fun getFields() = fields
+    fun getLocation() = location
+    fun getRadius() = radius
 }

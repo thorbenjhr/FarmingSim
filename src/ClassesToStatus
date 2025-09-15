@@ -18,10 +18,10 @@ IncidentType                DONE
 PACKAGE ACTIONS
 FarmHandler
 Task                        Getters, Setters
-Farm                        Getters, Setters
+Farm                        DON
 Bfs                         DONE
-SowingPlan                  Getters, Setters
-Machine                     Getters, Setters
+SowingPlan                  DONE
+Machine                     DONE
 
 PACKAGE LOGGING
 Logger                      functions that take lists instead of single vals
@@ -34,7 +34,7 @@ FarmsJSONParser
 ScenarioJSONParser
 
 PACKAGE ENVIRONMENTAL
-Environment                 Getters, Setters
+Environment                 DONE
 CloudManager
 Cloud                       DONE
 
