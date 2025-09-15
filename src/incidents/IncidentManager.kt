@@ -3,10 +3,12 @@ package incidents
 import Constants
 import actions.Farm
 import enums.IncidentType
+import enums.PlantType
 import enums.TileType
 import environmental.Cloud
 import environmental.CloudManager
 import layout.MapClass
+import layout.Tile
 import kotlin.math.max
 
 class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
@@ -76,11 +78,16 @@ class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
         val tile = m.getTileByIndex(incident.getLocation())
         val coord = tile?.getCoordinates()
         val neighboursCoord = coord?.getNeighbours(incident.getRadius())
-        val affectedTiles = neighboursCoord?.distinct()?.mapNotNull { m.getTileByCoordinates(it) }?.filter { it.getType() == TileType.FOREST }
-        affectedTiles?.forEach { t ->
-            val tileNeighbours = t.getCoordinates().getNeighbours()
-            val tileNeighboursFiltered = tileNeighbours.mapNotNull { m.getTileByCoordinates(it) }.filter { it.getType() == TileType.FIELD || it.getType() == TileType.PLANTATION }
 
+        val affectedForests = neighboursCoord?.distinct()?.mapNotNull { m.getTileByCoordinates(it) }?.filter { it.getType() == TileType.FOREST }.orEmpty()
+        val affectedNeighbours = affectedForests.flatMap { forest -> forest.getCoordinates().getNeighbours() }.mapNotNull { m.getTileByCoordinates(it) }.filter { it.getType() == TileType.FIELD || it.getType() == TileType.PLANTATION }.distinct()
+        affectedNeighbours.forEach { t ->
+            if (t.getType() == TileType.FIELD || (t.getType() == TileType.PLANTATION && t.getPlant()?.getType() == PlantType.GRAPE)) {
+                t.setHarvestEstimate(t.getHarvestEstimate() / 2)
+            } else {
+                // RESET MOWING!!!
+                t.setHarvestEstimate((t.getHarvestEstimate() * 0.9).toInt())
+            }
         }
     }
 }
