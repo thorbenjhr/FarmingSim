@@ -17,8 +17,8 @@ IncidentType                DONE
 
 PACKAGE ACTIONS
 FarmHandler
-Task                        Getters, Setters
-Farm                        DON
+Task                        DONE
+Farm                        DONE
 Bfs                         DONE
 SowingPlan                  DONE
 Machine                     DONE
@@ -40,9 +40,9 @@ Cloud                       DONE
 
 PACKAGE INCIDENTS
 IncidentManager
-Incident                    Getters, Setters
+Incident                    DONE
 
 PACKAGE HARVESTING
 HarvestEstimator
-PlantSpec
-Plant                       Getters, Setters
+PlantSpec                   DONE
+Plant                       DONE
