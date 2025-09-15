@@ -5,7 +5,7 @@ Simulation                  DONE
 
 PACKAGE LAYOUT
 Map                         DONE
-Tile                        NeedsAction, Setters, Setters
+Tile                        NeedsAction
 Coordinate                  DONE
 
 PACKAGE ENUMS
