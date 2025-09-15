@@ -11,6 +11,7 @@ class HarvestEstimator {
     private var currentEstimate = 0
 
     fun computeAllTiles(yearTick: Int, farms: Map<Int, Farm>) {
+        var newEstimate = 0
         farms.values.forEach { farm ->
             farm.getFields().values.forEach { tile ->
                 val plant = tile.getPlant()?: return
@@ -24,6 +25,7 @@ class HarvestEstimator {
                 estimate = applyIncidentEffect(estimate, env, plant)
 
                 tile.setHarvestEstimate(estimate)
+                newEstimate += estimate
             }
 
             farm.getPlantations().values.forEach { tile ->
@@ -38,8 +40,10 @@ class HarvestEstimator {
                 estimate = applyIncidentEffect(estimate, env, plant)
 
                 tile.setHarvestEstimate(estimate)
+                newEstimate += estimate
             }
         }
+        currentEstimate = newEstimate
     }
 
     private fun applySowingLate(currentEst: Int, plant: Plant): Int {
