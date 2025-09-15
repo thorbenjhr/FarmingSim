@@ -8,4 +8,21 @@ data class Machine(private val id: Int, private val name: String, private val ac
     fun setBrokenIncidentOver(tick: Int) {
         brokenIncidentOver = tick
     }
+    fun getId() = id
+    fun getName() = name
+    fun getActions() = actions
+    fun getPlants() = plants
+    fun getDurationDays() = durationDays
+    fun getLocation() = locationTileId
+    fun getAssigned() = assigned
+    fun getCarryingHarvest() = carryingHarvest
+    fun setCarryingHarvest(newCarryingHarvest: Boolean) {
+        carryingHarvest = newCarryingHarvest
+    }
+    fun setAssigned(newAssigned: Boolean) {
+        assigned = newAssigned
+    }
+    fun setLocation(newLocation: Int) {
+        locationTileId = newLocation
+    }
 }
