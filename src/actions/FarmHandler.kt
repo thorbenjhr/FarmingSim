@@ -100,10 +100,18 @@ class FarmHandler(private val bfs: Bfs, map: MapClass) {
             for (action in Action.entries){
                 if (action != Action.SOWING){
                     if (field.value.needsAction(action, currentTick)){
-                        taskListAllActions.add(Task(1111111111, action, field.value.getPlant(), field.key, currentTick, null, -1))
+                        taskListAllActions.add(Task(1111111111, action, field.value.getPlant(), field.key, TileType.FIELD, currentTick, null, null, null,-1))
                     //////fix id for tasks
 
                     }
+                }
+            }
+        }
+        for (plantation in farm.getPlantations()){
+            for (action in Action.entries) {
+                if (plantation.value.needsAction(action, currentTick)){
+                    taskListAllActions.add(Task(1111111111, action, plantation.value.getPlant(), plantation.key, TileType.PLANTATION, currentTick, null, null, null,-1))
+                        //////fix id for tasks
                 }
             }
         }
@@ -111,7 +119,58 @@ class FarmHandler(private val bfs: Bfs, map: MapClass) {
     }
 
     private fun prioritizeTasksAssignMachines(farm: Farm, tasks: List<Task>, currentTask: Int): Map<Int, List<Task>> {
-        TODO()
+        val actionOrder = mapOf(
+            Action.SOWING to 0,
+            Action.HARVESTING to 1,
+            Action.CUTTING to 2,
+            Action.IRRIGATING to 3,
+            Action.WEEDING to 4,
+            Action.MOWING to 5
+        )
+
+        val comparator = Comparator<Task> {a,b ->
+            // first complete sowing plans
+            val aInSowingPlan: Boolean = a.getSowingPlanId() != null
+            val bInSowingPlan: Boolean = b.getSowingPlanId() != null
+            if (aInSowingPlan and !bInSowingPlan) return@Comparator -1
+            if (!aInSowingPlan and bInSowingPlan) return@Comparator 1
+
+            // sowing plans first by increasing tick then by increasing id
+            if (aInSowingPlan and bInSowingPlan) {
+                val aTick = a.getSowingPlanTick() ?: Int.MAX_VALUE
+                val bTick = b.getSowingPlanTick() ?: Int.MAX_VALUE
+                if (aTick != bTick) return@Comparator aTick.compareTo(bTick)
+
+                val aSPId = a.getSowingPlanId() ?: Int.MAX_VALUE
+                val bSPId = b.getSowingPlanId() ?: Int.MAX_VALUE
+                if (aSPId != bSPId) return@Comparator aSPId.compareTo(bSPId)
+            }
+
+            // action ordering as specified
+            fun actionOrder(task: Task): Int {
+                val tileType = task.getTileType()
+                return when (task.getAction()) {
+                    Action.SOWING -> if (task.getSowingPlanId() != null) 1 else 9
+                    Action.HARVESTING -> if (tileType == TileType.PLANTATION) 2 else 3
+                    Action.CUTTING -> 4
+                    Action.IRRIGATING -> if (tileType == TileType.FIELD) 5 else 7
+                    Action.WEEDING -> 6
+                    Action.MOWING -> 8
+                }
+            }
+            val aAction = actionOrder(a)
+            val bAction = actionOrder(b)
+            if (aAction != bAction) return@Comparator aAction.compareTo(bAction)
+
+            // if all else fails prioritize from lowest to highest id in all tasks
+            return@Comparator a.getTileId().compareTo(b.getTileId())
+        }
+
+        val priorityQueue = java.util.PriorityQueue<Task>(comparator)
+        priorityQueue.addAll(tasks)
+        val ordered = mutableListOf<Task>()
+        while (priorityQueue.isNotEmpty()) ordered.add(priorityQueue.poll())
+        return mapOf(-1 to ordered)
     }
 
     private fun selectMachineForTask(task: Task) {
