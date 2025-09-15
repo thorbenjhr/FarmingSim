@@ -2,8 +2,10 @@ package actions
 
 import Constants
 import enums.Action
+import enums.TileType
+import layout.MapClass
 
-class FarmHandler(private val bfs: Bfs) {
+class FarmHandler(private val bfs: Bfs, map: MapClass) {
     fun reduceMoisture(farms: Map<Int, Farm>): Pair<Int, Int> {
         var fields = 0
         var plantations = 0
@@ -32,25 +34,83 @@ class FarmHandler(private val bfs: Bfs) {
     }
 
     fun performActions(farms: Map<Int, Farm>, currentTick: Int, yearTick: Int) {
+        farms.toSortedMap().forEach { farm ->
+            val tasks = gatherAndSchedule(farm.value, currentTick, yearTick)
+            completeTasks(farm.value)
+        }
     }
 
-    private fun gatherAndSchedule(currentTick: Int, yearTick: Int) {
+    private fun gatherAndSchedule(farm: Farm, currentTick: Int, yearTick: Int) {
+        //getActiveSowingPlans(),collectSowingTargets(),gatherPendingTasks(), prioritizeTasksAssignMachines()
         TODO()
     }
 
-    private fun getActiveSowingPlans(currentTick: Int): Map<Int, SowingPlan> {
-        TODO()
+    private fun getActiveSowingPlans(farm: Farm, currentTick: Int): Map<Int, SowingPlan> {
+        val activePlans = farm.getSowingPlans() // Map<SowingPlanId, SowingPlan>
+            .filter{it.value.getTick() <= currentTick}
+        // sorting of ids not implemented
+        return activePlans
     }
 
-    private fun collectSowingTargets(sowingPlans: Map<Int, SowingPlan>): Map<Int, List<Int>> {
-        TODO()
+    private fun collectSowingTargets(farm: Farm, sowingPlans: Map<Int, SowingPlan>, currentTick: Int, map: MapClass): Map<Int, List<Int>> {
+        val readyTargets = mutableMapOf<Int, List<Int>>() //Map<sowingPlanId, List<sowingTargetTileIds>>
+        for (sowingPlan in sowingPlans.values) {
+            val planId = sowingPlan.getId()
+            val planPlant = sowingPlan.getPlant().getType()
+
+            val candidateTiles = mutableListOf<Int>()
+
+            // sowing plans with fields given
+            if (sowingPlan.getFields().isNotEmpty()) {
+                for (tileId in sowingPlan.getFields()) {
+                    val tile = farm.getFields()[tileId]
+                    if (tile != null
+                        && tile.needsAction(Action.SOWING, currentTick)
+                        && tile.getPossiblePlants()?.contains(planPlant) == true
+                    ) {
+                        candidateTiles.add(tileId)
+                    }
+                }
+            }
+
+            val planLocation = sowingPlan.getLocation()
+            val planRadius = sowingPlan.getRadius()
+            if (planLocation != null && planRadius != null && planRadius >= 0) {
+                val tile = farm.getFields()[planLocation]
+                val neighbourCoord = tile?.getCoordinates()?.getNeighbours(radius = planRadius)
+                if (neighbourCoord != null) {
+                    for (coord in neighbourCoord){
+                        val tile = map.getTileByCoordinates(coord)
+                        if (tile?.getType() == TileType.FIELD && tile.needsAction(Action.SOWING, currentTick)
+                            && tile.getPossiblePlants()?.contains(planPlant) == true
+                        ){
+                            candidateTiles.add(tile.getId())
+                        }
+                    }
+                }
+            }
+            readyTargets[planId] = candidateTiles
+        }
+        return readyTargets
     }
 
-    private fun gatherPendingTasks(currentTick: Int, yearTick: Int): List<Task> {
-        TODO()
+    private fun gatherPendingTasks(farm: Farm, currentTick: Int, yearTick: Int): List<Task> {
+        val taskListAllActions = mutableListOf<Task>()
+        for (field in farm.getFields()){
+            for (action in Action.entries){
+                if (action != Action.SOWING){
+                    if (field.value.needsAction(action, currentTick)){
+                        taskListAllActions.add(Task(1111111111, action, field.value.getPlant(), field.key, currentTick, null, -1))
+                    //////fix id for tasks
+
+                    }
+                }
+            }
+        }
+        return taskListAllActions
     }
 
-    private fun prioritizeTasksAssignMachines(tasks: List<Task>): Map<Int, List<Task>> {
+    private fun prioritizeTasksAssignMachines(farm: Farm, tasks: List<Task>, currentTask: Int): Map<Int, List<Task>> {
         TODO()
     }
 
@@ -58,7 +118,7 @@ class FarmHandler(private val bfs: Bfs) {
         TODO()
     }
 
-    private fun completeTasks() {
+    private fun completeTasks(farm: Farm) {
         TODO()
     }
 
