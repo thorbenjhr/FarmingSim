@@ -17,7 +17,7 @@ class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
             when (incident.getType()) {
                 IncidentType.CLOUDCREATION -> applyCloudCreation(incident, cm)
                 IncidentType.BEEHAPPY -> applyBeeHappy()
-                IncidentType.DROUGHT -> applyDrought()
+                IncidentType.DROUGHT -> applyDrought(incident, m, farms, tick)
                 IncidentType.BROKENMACHNINE -> applyBrokenMachine(incident, farms, tick)
                 IncidentType.CITYEXPANSION -> applyCityExpansion(incident, m, farms)
                 IncidentType.ANIMALATTACK -> applyAnimalAttack()
@@ -34,8 +34,22 @@ class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
         TODO()
     }
 
-    private fun applyDrought() {
-        TODO()
+    private fun applyDrought(incident: Incident, m: MapClass, farms: Map<Int, Farm>, tick: Int) {
+        val tile = m.getTileByIndex(incident.getLocation())
+        val coord = tile?.getCoordinates()
+        val neighboursCoord = coord?.getNeighbours(incident.getRadius())
+        val affectedTiles = neighboursCoord?.mapNotNull { m.getTileByCoordinates(it) }?.filter { it.getType() == TileType.PLANTATION || it.getType() == TileType.FIELD }
+        affectedTiles?.forEach { t ->
+            t.getEnvironment()?.setSoilMoisture(Constants.NO_VALUE)
+            t.setHarvestEstimate(Constants.NO_VALUE)
+            t.setPlant(null)
+            if (t.getType() == TileType.PLANTATION) {
+                t.setDead(true)
+                farms[t.getFarmId()]?.getFields()?.remove(t.getId())
+            } else {
+                t.setFallowPeriodOver(tick + Constants.FALLOW_PERIOD_TICKS + 1)
+            }
+        }
     }
 
     private fun applyBrokenMachine(incident: Incident, farms: Map<Int, Farm>, tick: Int) {

@@ -14,6 +14,10 @@ class Environment(private var currentSoilMoisture: Int, private var capacity: In
     fun getBeeHappyEvents() = beeHappyEvents
     fun getAnimalAttack() = animalAttack
 
+    fun setSoilMoisture(moisture: Int) {
+        currentSoilMoisture = moisture
+    }
+
     fun setSunlightPenalty(newPenalty: Int) {
         sunlightPenalty = newPenalty
     }

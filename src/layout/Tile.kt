@@ -8,7 +8,7 @@ import enums.PlantType
 import enums.TileType
 import kotlin.math.abs
 
-data class Tile(private val id: Int, private var type: TileType?, internal val coordinates: Coordinate, private val airflow: Boolean, private val direction: Direction?, private var farmId: Int, private val shed: Boolean, private val possiblePlant: List<PlantType>?, private val plant: Plant?, private val dead: Boolean, private var fallowPeriodOver: Int, private val env: Environment?, private var harvestEstimate: Int = 0) {
+data class Tile(private val id: Int, private var type: TileType?, internal val coordinates: Coordinate, private val airflow: Boolean, private val direction: Direction?, private var farmId: Int, private val shed: Boolean, private val possiblePlants: List<PlantType>?, private var plant: Plant?, private var dead: Boolean, private var fallowPeriodOver: Int, private val env: Environment?, private var harvestEstimate: Int = 0) {
 
     fun getId() = id
     fun getType() = type
@@ -19,6 +19,7 @@ data class Tile(private val id: Int, private var type: TileType?, internal val c
     fun getShed() = shed
     fun getPossiblePlants() = possiblePlants
     fun getPlant() = plant
+    fun getDead() = dead
     fun getEnvironment() = env
     fun getHarvestEstimate() = harvestEstimate
 
@@ -32,11 +33,19 @@ data class Tile(private val id: Int, private var type: TileType?, internal val c
         harvestEstimate = newEstimate
     }
 
-    fun setPlant(newPlant: Plant) {
+    fun setPlant(newPlant: Plant?) {
         plant = newPlant
     }
 
     fun setTileType(newType: TileType) {
         type = newType
+    }
+
+    fun setDead(newDead: Boolean) {
+        dead = newDead
+    }
+
+    fun setFallowPeriodOver(end: Int) {
+        fallowPeriodOver = end
     }
 }
