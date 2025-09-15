@@ -1,9 +1,12 @@
 import actions.Bfs
+import actions.Farm
 import actions.FarmHandler
 import enums.Direction
+import enums.IncidentType
 import enums.TileType
 import environmental.CloudManager
 import harvesting.HarvestEstimator
+import incidents.Incident
 import incidents.IncidentManager
 import layout.Coordinate
 import layout.MapClass
@@ -100,6 +103,18 @@ fun test2() {
         println(tid2.getId())
     } else {
         println("NULL")
+    }
+
+    val im = IncidentManager(emptyMap())
+    val f = Farm(5, "", mapOf(1 to t9),
+        mapOf(1 to t1, 6 to t6, 7 to t7, 13 to t13) as MutableMap<Int, Tile>, emptyMap(), emptyMap(), emptyMap())
+    val farms = mapOf(
+        5 to f
+    )
+    im.applyCityExpansion(Incident(0,0, IncidentType.CITYEXPANSION, 1,0,0,0,0, 0), mapMap, farms)
+
+    f.getFields().values.forEach { t ->
+        println("Type: ${t.getType()} with farmId: ${t.getFarmId()}")
     }
 }
 

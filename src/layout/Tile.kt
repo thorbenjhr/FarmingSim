@@ -34,4 +34,8 @@ data class Tile(private val id: Int, private var type: TileType?, internal val c
     fun setPlant(newPlant: Plant) {
         plant = newPlant
     }
+
+    fun setTileType(newType: TileType) {
+        type = newType
+    }
 }
