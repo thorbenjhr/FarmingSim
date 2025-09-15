@@ -5,7 +5,7 @@ Simulation                  DONE
 
 PACKAGE LAYOUT
 Map                         DONE
-Tile                        NeedsAction, Setters, Setters
+Tile                        NeedsAction
 Coordinate                  DONE
 
 PACKAGE ENUMS
@@ -17,11 +17,11 @@ IncidentType                DONE
 
 PACKAGE ACTIONS
 FarmHandler
-Task                        Getters, Setters
-Farm                        Getters, Setters
+Task                        DONE
+Farm                        DONE
 Bfs                         DONE
-SowingPlan                  Getters, Setters
-Machine                     Getters, Setters
+SowingPlan                  DONE
+Machine                     DONE
 
 PACKAGE LOGGING
 Logger                      functions that take lists instead of single vals
@@ -34,15 +34,15 @@ FarmsJSONParser
 ScenarioJSONParser
 
 PACKAGE ENVIRONMENTAL
-Environment                 Getters, Setters
+Environment                 DONE
 CloudManager
 Cloud                       DONE
 
 PACKAGE INCIDENTS
 IncidentManager
-Incident                    Getters, Setters
+Incident                    DONE
 
 PACKAGE HARVESTING
 HarvestEstimator
-PlantSpec
-Plant                       Getters, Setters
+PlantSpec                   DONE
+Plant                       DONE

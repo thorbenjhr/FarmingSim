@@ -3,6 +3,7 @@ package incidents
 import Constants
 import actions.Farm
 import enums.IncidentType
+import enums.TileType
 import environmental.Cloud
 import environmental.CloudManager
 import layout.MapClass
@@ -49,8 +50,12 @@ class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
         }
     }
 
-    private fun applyCityExpansion(incident: Incident, m: MapClass, farms: Map<Int, Farm>) {
-        TODO()
+    fun applyCityExpansion(incident: Incident, m: MapClass, farms: Map<Int, Farm>) {
+        val tile = m.getTileByIndex(incident.getLocation())?: return
+        if (tile.getType() == TileType.FIELD) {
+            farms[tile.getFarmId()]?.getFields()?.remove(tile.getId())
+        }
+        tile.setTileType(TileType.VILLAGE)
     }
 
     private fun applyAnimalAttack() {
