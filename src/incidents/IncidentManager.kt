@@ -8,7 +8,6 @@ import enums.TileType
 import environmental.Cloud
 import environmental.CloudManager
 import layout.MapClass
-import layout.Tile
 import kotlin.math.max
 
 class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
