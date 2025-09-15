@@ -9,4 +9,13 @@ data class Farm(private val id: Int, private val name: String, private val farms
     fun getPlantations() = plantations
     fun getMachines() = machines
     fun getSowingPlans() = sowingPlans
+    fun setFields(newFields: Map<Int, Tile>) {
+        fields = newFields
+    }
+    fun setMachines(newMachines: Map<Int, Machine>) {
+        machines = newMachines
+    }
+    fun setSowingPlans(newSowingPlans: Map<Int, SowingPlan>) {
+        sowingPlans = newSowingPlans
+    }
 }
