@@ -6,7 +6,7 @@ import enums.PlantType
 import enums.TileType
 import layout.MapClass
 
-class FarmHandler(private val bfs: Bfs, map: MapClass) {
+class FarmHandler(private val bfs: Bfs) {
     fun reduceMoisture(farms: Map<Int, Farm>): Pair<Int, Int> {
         var fields = 0
         var plantations = 0
@@ -51,7 +51,7 @@ class FarmHandler(private val bfs: Bfs, map: MapClass) {
         for ((sowingPlanId, fields) in sowingTargets) {
             val plantToSow = activeSowingPlans[sowingPlanId]?.getPlant()
             for (field in fields) {
-                val newTask = Task(111111111, Action.SOWING, plantToSow, field, TileType.FIELD ,currentTick, null, sowingPlanId, 111111111, -1)
+                val newTask = Task(Action.SOWING, plantToSow, field, TileType.FIELD , currentTick, null, sowingPlanId, activeSowingPlans[sowingPlanId]?.getTick(), -1)
                 allTasks.add(newTask)
             }
         }
@@ -117,9 +117,7 @@ class FarmHandler(private val bfs: Bfs, map: MapClass) {
             for (action in Action.entries){
                 if (action != Action.SOWING){
                     if (field.value.needsAction(action, currentTick)){
-                        taskListAllActions.add(Task(1111111111, action, field.value.getPlant(), field.key, TileType.FIELD, currentTick, null, null, null,-1))
-                    //////fix id for tasks
-
+                        taskListAllActions.add(Task(action, field.value.getPlant(), field.key, TileType.FIELD, currentTick, null, null, null,-1))
                     }
                 }
             }
@@ -127,8 +125,7 @@ class FarmHandler(private val bfs: Bfs, map: MapClass) {
         for (plantation in farm.getPlantations()){
             for (action in Action.entries) {
                 if (plantation.value.needsAction(action, currentTick)){
-                    taskListAllActions.add(Task(1111111111, action, plantation.value.getPlant(), plantation.key, TileType.PLANTATION, currentTick, null, null, null,-1))
-                        //////fix id for tasks
+                    taskListAllActions.add(Task(action, plantation.value.getPlant(), plantation.key, TileType.PLANTATION, currentTick, null, null, null,-1))
                 }
             }
         }
@@ -136,7 +133,7 @@ class FarmHandler(private val bfs: Bfs, map: MapClass) {
     }
 
     private fun prioritizeTasksAssignMachines(farm: Farm, tasks: List<Task>, currentTick: Int): Map<Int, List<Task>> {
-        val comparator = makeTaskComparator(farm)
+        val comparator = makeTaskComparator()
 
         val priorityQueue = java.util.PriorityQueue<Task>(comparator)
         priorityQueue.addAll(tasks)
@@ -149,7 +146,7 @@ class FarmHandler(private val bfs: Bfs, map: MapClass) {
         return tasksWithMachines
     }
 
-    private fun makeTaskComparator(farm: Farm): Comparator<Task> {
+    private fun makeTaskComparator(): Comparator<Task> {
         return Comparator<Task> { a, b ->
             // first complete sowing plans
             val aInSowingPlan: Boolean = a.getSowingPlanId() != null

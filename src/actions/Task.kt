@@ -4,8 +4,7 @@ import enums.Action
 import enums.TileType
 import harvesting.Plant
 
-data class Task(private val id: Int, private var action: Action, private val plant: Plant?, private val tileId: Int, private val tileType: TileType, private val currentTick: Int, private var assignedMachine: Machine?, private var sowingPlanId: Int?, private var sowingPlanTick: Int?, private var shedId: Int = -1) {
-    fun getId() = id
+data class Task(private var action: Action, private val plant: Plant?, private val tileId: Int, private val tileType: TileType, private val currentTick: Int, private var assignedMachine: Machine?, private var sowingPlanId: Int?, private var sowingPlanTick: Int?, private var shedId: Int = -1) {
     fun getAction() = action
     fun getPlant() = plant
     fun getTileId() = tileId
