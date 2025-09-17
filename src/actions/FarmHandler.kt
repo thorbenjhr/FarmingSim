@@ -5,6 +5,7 @@ import enums.Action
 import enums.PlantType
 import enums.TileType
 import layout.MapClass
+import harvesting.Plant
 
 class FarmHandler(private val bfs: Bfs) {
     fun reduceMoisture(farms: Map<Int, Farm>): Pair<Int, Int> {
@@ -37,7 +38,7 @@ class FarmHandler(private val bfs: Bfs) {
     fun performActions(farms: Map<Int, Farm>, currentTick: Int, yearTick: Int, map: MapClass) {
         farms.toSortedMap().forEach { farm ->
             val tasks = gatherAndSchedule(farm.value, currentTick, yearTick, map)
-            completeTasks(farm.value, tasks, currentTick, map)
+            completeTasks(farm.value, tasks, yearTick, map)
         }
     }
 
@@ -290,11 +291,12 @@ class FarmHandler(private val bfs: Bfs) {
         return assignments.mapValues { it.value.toList() }
     }
 
-    private fun moveToTileAndApplyChange(machineId: Int, sowingPlanId: Int?, taskTile: Int, action: Action, tick: Int, map: MapClass) {
+    private fun moveToTileAndApplyChange(machineId: Int, sowingPlanId: Int?, plant: Plant?, taskTile: Int, action: Action, yearTick: Int, map: MapClass) {
         val tile = map.getTileByIndex(taskTile)
         val tilePlant = tile?.getPlant()
-        tilePlant?.setLastActions(tick,action)
+        tilePlant?.setLastActions(yearTick,action)
         if (action == Action.SOWING) {
+            tile?.setPlant(plant)
             tile?.setHarvestEstimate(1111111)
             //logging.Logger.logFarmSowing(machineId, tilePlant, sowingPlanId)
         }
@@ -305,14 +307,14 @@ class FarmHandler(private val bfs: Bfs) {
         }
     }
 
-    private fun completeTasks(farm: Farm, tasks: Map<Int, List<Task>>, currentTick: Int, map: MapClass) {
+    private fun completeTasks(farm: Farm, tasks: Map<Int, List<Task>>, yearTick: Int, map: MapClass) {
         logging.Logger.logFarmStartingActions(farm.getId())
 
         for ((machine, taskList) in tasks) {
             for (task in taskList){
                 logging.Logger.logFarmAction(machine, task.getAction(), task.getTileId(), farm.getMachines()[machine]!!.getDurationDays())
                 //////get correct duration for logging ... from farm
-                moveToTileAndApplyChange(machine, task.getSowingPlanId(),task.getTileId(), task.getAction(), currentTick, map)
+                moveToTileAndApplyChange(machine, task.getSowingPlanId(),task.getPlant(),task.getTileId(), task.getAction(), yearTick, map)
                 //////should be current or year tick
             }
             val stuckMachine = handleShedReturn(farm, machine, taskList)
@@ -370,3 +372,4 @@ class FarmHandler(private val bfs: Bfs) {
 ////SHED LOGIC what happens if machine can't return log, set task id shed to -1, remove machine from farm, how remove harvest?
 /// do we log the harvest per harvesting of tile, how remove harvest if machine gets stuck
 ////FIX LOGGING
+/// irrigating is nowhere

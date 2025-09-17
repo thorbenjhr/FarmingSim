@@ -23,11 +23,32 @@ data class Tile(private val id: Int, private var type: TileType?, internal val c
     fun getEnvironment() = env
     fun getHarvestEstimate() = harvestEstimate
 
+    fun setHarvestEstimate(newEstimate: Int) {
+        harvestEstimate = newEstimate
+    }
+
+    fun setPlant(newPlant: Plant?) {
+        plant = newPlant
+    }
+
+    fun setTileType(newType: TileType) {
+        type = newType
+    }
+
+    fun setDead(newDead: Boolean) {
+        dead = newDead
+    }
+
+    fun setFallowPeriodOver(end: Int) {
+        fallowPeriodOver = end
+    }
+
     fun isSquare(): Boolean {
         return abs(coordinates.getX() % 2) == 1
     }
 
     fun needsAction(action: Action, yearTick: Int): Boolean {
+        // for sowing plans to determine whether fallow period over
         if (plant == null) {
             if (action == Action.SOWING) {
                 if (type == TileType.FIELD && !dead) {
@@ -121,23 +142,4 @@ data class Tile(private val id: Int, private var type: TileType?, internal val c
         }
     }
 
-    fun setHarvestEstimate(newEstimate: Int) {
-        harvestEstimate = newEstimate
-    }
-
-    fun setPlant(newPlant: Plant?) {
-        plant = newPlant
-    }
-
-    fun setTileType(newType: TileType) {
-        type = newType
-    }
-
-    fun setDead(newDead: Boolean) {
-        dead = newDead
-    }
-
-    fun setFallowPeriodOver(end: Int) {
-        fallowPeriodOver = end
-    }
 }
