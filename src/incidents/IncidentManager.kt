@@ -12,13 +12,13 @@ import logging.Logger
 import kotlin.math.max
 
 class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
-    fun handleIncidents(tick: Int, cm: CloudManager, m: MapClass, farms: Map<Int, Farm>) {
+    fun handleIncidents(tick: Int, yearTick: Int, cm: CloudManager, m: MapClass, farms: Map<Int, Farm>) {
         val tickIncidents = incidents[tick]?: return
 
         for (incident in tickIncidents) {
             when (incident.getType()) {
                 IncidentType.CLOUDCREATION -> applyCloudCreation(incident, cm)
-                IncidentType.BEEHAPPY -> applyBeeHappy()
+                IncidentType.BEEHAPPY -> applyBeeHappy(incident, m, yearTick)
                 IncidentType.DROUGHT -> applyDrought(incident, m, farms, tick)
                 IncidentType.BROKENMACHNINE -> applyBrokenMachine(incident, farms, tick)
                 IncidentType.CITYEXPANSION -> applyCityExpansion(incident, m, farms)
@@ -34,8 +34,22 @@ class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
         cm.addCloud(cloud)
     }
 
-    private fun applyBeeHappy() {
-        TODO()
+    private fun applyBeeHappy(incident: Incident, m: MapClass, yearTick: Int) {
+        val tile = m.getTileByIndex(incident.getLocation())
+        val coord = tile?.getCoordinates()
+        val neighboursCoord = coord?.getNeighbours(incident.getRadius())
+        val meadowTiles = neighboursCoord?.distinct()?.mapNotNull { m.getTileByCoordinates(it) }?.filter { it.getType() == TileType.MEADOW }?:emptyList()
+        val meadowTilesRadius = meadowTiles.flatMap { meadow ->
+            meadow.getCoordinates().getNeighbours(2).mapNotNull { m.getTileByCoordinates(it) }.distinct()
+        }
+
+        meadowTilesRadius.forEach { t ->
+            val spec = t.getPlant()?.getType()?.getSpec()
+            val env = t.getEnvironment()
+            if (spec?.getInsectPollination() == true && spec.getBloomSchedule().contains(yearTick)) {
+                env?.setBeeHappyEvents(env.getBeeHappyEvents() + incident.getEffect())
+            }
+        }
     }
 
     private fun applyDrought(incident: Incident, m: MapClass, farms: Map<Int, Farm>, tick: Int) {
