@@ -43,7 +43,7 @@ class Simulation (private val m: MapClass, private val farms: Map<Int, Farm>, pr
     }
 
     private fun assignActionsAndPerform() {
-        farmHandler.performActions(farms, currentTick, yearTick)
+        farmHandler.performActions(farms, currentTick, yearTick, m)
     }
 
     private fun startAndEndIncidents() {

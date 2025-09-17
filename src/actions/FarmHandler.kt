@@ -45,7 +45,7 @@ class FarmHandler(private val bfs: Bfs) {
         val activeSowingPlans = getActiveSowingPlans(farm, currentTick)
 
         val allTasks: MutableList<Task> = mutableListOf()
-        val sowingTargets = collectSowingTargets(farm, activeSowingPlans, currentTick, map)
+        val sowingTargets = collectSowingTargets(farm, activeSowingPlans, yearTick, map)
 
         // make sowing targets into tasks
         for ((sowingPlanId, fields) in sowingTargets) {
@@ -69,7 +69,7 @@ class FarmHandler(private val bfs: Bfs) {
         return activePlans
     }
 
-    private fun collectSowingTargets(farm: Farm, sowingPlans: Map<Int, SowingPlan>, currentTick: Int, map: MapClass): Map<Int, List<Int>> {
+    private fun collectSowingTargets(farm: Farm, sowingPlans: Map<Int, SowingPlan>, yearTick: Int, map: MapClass): Map<Int, List<Int>> {
         val readyTargets = mutableMapOf<Int, List<Int>>() //Map<sowingPlanId, List<sowingTargetTileIds>>
         for (sowingPlan in sowingPlans.values) {
             val planId = sowingPlan.getId()
@@ -82,7 +82,7 @@ class FarmHandler(private val bfs: Bfs) {
                 for (tileId in sowingPlan.getFields()) {
                     val tile = farm.getFields()[tileId]
                     if (tile != null
-                        && tile.needsAction(Action.SOWING, currentTick)
+                        && tile.needsAction(Action.SOWING, yearTick)
                         && tile.getPossiblePlants()?.contains(planPlant) == true
                     ) {
                         candidateTiles.add(tileId)
@@ -98,7 +98,7 @@ class FarmHandler(private val bfs: Bfs) {
                 if (neighbourCoord != null) {
                     for (coord in neighbourCoord){
                         val tile = map.getTileByCoordinates(coord)
-                        if (tile?.getType() == TileType.FIELD && tile.needsAction(Action.SOWING, currentTick)
+                        if (tile?.getType() == TileType.FIELD && tile.needsAction(Action.SOWING, yearTick)
                             && tile.getPossiblePlants()?.contains(planPlant) == true
                         ){
                             candidateTiles.add(tile.getId())
@@ -116,7 +116,7 @@ class FarmHandler(private val bfs: Bfs) {
         for (field in farm.getFields()){
             for (action in Action.entries){
                 if (action != Action.SOWING){
-                    if (field.value.needsAction(action, currentTick)){
+                    if (field.value.needsAction(action, yearTick)){
                         taskListAllActions.add(Task(action, field.value.getPlant(), field.key, TileType.FIELD, currentTick, null, null, null,-1))
                     }
                 }
@@ -124,7 +124,7 @@ class FarmHandler(private val bfs: Bfs) {
         }
         for (plantation in farm.getPlantations()){
             for (action in Action.entries) {
-                if (plantation.value.needsAction(action, currentTick)){
+                if (plantation.value.needsAction(action, yearTick)){
                     taskListAllActions.add(Task(action, plantation.value.getPlant(), plantation.key, TileType.PLANTATION, currentTick, null, null, null,-1))
                 }
             }
@@ -212,6 +212,7 @@ class FarmHandler(private val bfs: Bfs) {
             assignments.computeIfAbsent(machine.getId()) {mutableListOf()}.add(task)
             alreadyAssigned.add(task.getTileId() to task.getAction())
             task.setShedId(machine.getLocation()) ////DOUBLE CHECK
+            machine.setAssigned(true)
         }
 
         // make new array to hold tasks in their given order and be able to remove as we assign
@@ -309,22 +310,24 @@ class FarmHandler(private val bfs: Bfs) {
 
         for ((machine, taskList) in tasks) {
             for (task in taskList){
-                logging.Logger.logFarmAction(machine, task.getAction(), task.getTileId(), 1)
+                logging.Logger.logFarmAction(machine, task.getAction(), task.getTileId(), farm.getMachines()[machine]!!.getDurationDays())
                 //////get correct duration for logging ... from farm
                 moveToTileAndApplyChange(machine, task.getSowingPlanId(),task.getTileId(), task.getAction(), currentTick, map)
                 //////should be current or year tick
             }
             val stuckMachine = handleShedReturn(farm, machine, taskList)
-            if (!stuckMachine) {
+            if (stuckMachine) {
                 taskList.forEach { task ->  }
             }
+            val machineObj = farm.getMachines()[machine]
+            machineObj?.setAssigned(false)
         }
     }
 
     private fun handleShedReturn(farm: Farm, machineId: Int, taskList: List<Task>): Boolean {
-        val lastTask = taskList.lastOrNull() ?: return true
-        if (lastTask.getAction() != Action.HARVESTING) return true
-        val machine = farm.getMachines()[machineId] ?: return true
+        val lastTask = taskList.lastOrNull() ?: return false
+        if (lastTask.getAction() != Action.HARVESTING) return false
+        val machine = farm.getMachines()[machineId] ?: return false
         val fromTile = lastTask.getTileId()
         val originShedTile = machine.getLocation()
 
@@ -339,7 +342,7 @@ class FarmHandler(private val bfs: Bfs) {
         if (pathToShed(fromTile, originShedTile, true)) {
             lastTask.setShedId(originShedTile)
             logging.Logger.logFarmMachineFinishedToShed(machineId, originShedTile)
-            return true
+            return false
         }
         val farmsteadsWithShed = farm.getFarmsteads()
                                     .filter { it.value.getShed() }
@@ -351,15 +354,16 @@ class FarmHandler(private val bfs: Bfs) {
                 lastTask.setShedId(farmstead)
                 machine.setLocation(farmstead)
                 logging.Logger.logFarmMachineFinishedToShed(machineId, farmstead)
-                return true
+                return false
             }
         }
 
         // if machine can not get to farmstead remove from machine list
         logging.Logger.logFarmMachineFinishedNoReturn(machineId)
         lastTask.setShedId(-1)
-        farm.getMachines().remove(machineId)
-        return false
+        val newMachines: MutableMap<Int, Machine> = (farm.getMachines() - machineId).toMutableMap()
+        farm.setMachines(newMachines)
+        return true
     }
 }
 

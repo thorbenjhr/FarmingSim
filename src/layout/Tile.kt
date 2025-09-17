@@ -27,7 +27,99 @@ data class Tile(private val id: Int, private var type: TileType?, internal val c
         return abs(coordinates.getX() % 2) == 1
     }
 
-    fun needsAction(action: Action, currentTick: Int): Boolean = TODO()
+    fun needsAction(action: Action, yearTick: Int): Boolean {
+        if (plant == null) {
+            if (action == Action.SOWING) {
+                if (type == TileType.FIELD && !dead) {
+                    return yearTick >= fallowPeriodOver
+                }
+            }
+        }
+
+        if (dead) return false
+
+        val plantSpec = plant!!.getType().getSpec()
+        val lastActions = plant!!.getLastActions()
+        val allowedLate = plantSpec.getLatePenaltyMap()[action]?.first ?: 0
+
+        fun lastTickOfAction(action: Action) = lastActions.entries.filter { it.value == action }.maxByOrNull { it.key }?.key
+        // tick t before yearTick (wrapping around 1..24 logic)
+        fun tickBefore(yearTick: Int, t: Int) = ((yearTick - t - 1 + 24) % 24) + 1
+        val lastSowTick = lastTickOfAction(Action.SOWING)
+
+        when (action) { // false when shouldn't be done, true when needs to be done
+            Action.SOWING -> {
+                if (lastSowTick != null) return false
+                if (plantSpec.getSowingSchedule().contains(yearTick)) return true
+                if (allowedLate > 0) {
+                    for (t in 1..allowedLate) {
+                        val check = tickBefore(yearTick, t)
+                        if (plantSpec.getSowingSchedule().contains(check)) return true
+                    }
+                }
+                return false
+            }
+            Action.WEEDING -> {
+                val lastSowTick = lastSowTick ?: return false
+                val differenceSinceLastSow = ((yearTick - lastSowTick) + 24) % 24
+
+                val lastWeedTick = lastTickOfAction(Action.WEEDING)
+                if (lastWeedTick != null && lastTickOfAction(Action.SOWING) != null) {
+                    val tickSinceLastWeed = ((lastWeedTick - lastSowTick) + 24) % 24
+                    if (tickSinceLastWeed == differenceSinceLastSow) return false
+                }
+
+                val weedingSchedule = plantSpec.getWeedSchedule()
+                if (weedingSchedule.any{it == differenceSinceLastSow}) return true
+
+                if (allowedLate > 0) {
+                    for (offset in weedingSchedule) {
+                        if (differenceSinceLastSow in (offset + 1)..(offset + allowedLate)) return true
+                    }
+                }
+                return false
+            }
+            Action.CUTTING -> {
+                val cuttingSchedule = plantSpec.getCuttingSchedule()
+                if (cuttingSchedule.contains(yearTick)) return true
+                if (allowedLate > 0) {
+                    for (t in 1..allowedLate) {
+                        val check = tickBefore(yearTick, t)
+                        if (plantSpec.getCuttingSchedule().contains(check)) return true
+                    }
+                }
+                return false
+            }
+            Action.HARVESTING -> {
+                val lastHarvestTick = lastTickOfAction(Action.HARVESTING)
+                if (lastHarvestTick != null && lastSowTick != null && lastHarvestTick > lastSowTick) return false
+                if (lastHarvestTick != null && lastSowTick == null) return false
+
+                val harvestSchedule = plantSpec.getHarvestSchedule()
+                if (harvestSchedule.contains(yearTick)) return true
+
+                if (allowedLate > 0) {
+                    for (t in 1..allowedLate) {
+                        val check = tickBefore(yearTick, t)
+                        if (plantSpec.getHarvestSchedule().contains(check)) return true
+                    }
+                }
+                return false
+            }
+            Action.MOWING -> {
+                val mowingSchedule = plantSpec.getMowingSchedule()
+                if (mowingSchedule.contains(yearTick)) return true
+                if (allowedLate > 0) {
+                    for (t in 1..allowedLate) {
+                        val check = tickBefore(yearTick, t)
+                        if (plantSpec.getMowingSchedule().contains(check)) return true
+                    }
+                }
+                return false
+            }
+            Action.IRRIGATING -> { return false }
+        }
+    }
 
     fun setHarvestEstimate(newEstimate: Int) {
         harvestEstimate = newEstimate
