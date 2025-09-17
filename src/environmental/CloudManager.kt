@@ -34,5 +34,6 @@ class CloudManager(private var map: MapClass, private var clouds: MutableMap<Int
     fun addCloud(cloud: Cloud) {
         cloud.setId(clouds.keys.max() + 1)
         clouds[cloud.getId()] = cloud
+        tileToCloud[cloud.getLocation()] = cloud.getId()
     }
 }
