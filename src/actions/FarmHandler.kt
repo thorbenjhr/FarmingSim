@@ -211,6 +211,7 @@ class FarmHandler(private val bfs: Bfs) {
         fun assignToMachine(machine: Machine, task: Task) {
             assignments.computeIfAbsent(machine.getId()) {mutableListOf()}.add(task)
             alreadyAssigned.add(task.getTileId() to task.getAction())
+            task.setShedId(machine.getLocation()) ////DOUBLE CHECK
         }
 
         // make new array to hold tasks in their given order and be able to remove as we assign
@@ -313,11 +314,53 @@ class FarmHandler(private val bfs: Bfs) {
                 moveToTileAndApplyChange(machine, task.getSowingPlanId(),task.getTileId(), task.getAction(), currentTick, map)
                 //////should be current or year tick
             }
-
+            val stuckMachine = handleShedReturn(farm, machine, taskList)
+            if (!stuckMachine) {
+                taskList.forEach { task ->  }
+            }
         }
-
     }
 
+    private fun handleShedReturn(farm: Farm, machineId: Int, taskList: List<Task>): Boolean {
+        val lastTask = taskList.lastOrNull() ?: return true
+        if (lastTask.getAction() != Action.HARVESTING) return true
+        val machine = farm.getMachines()[machineId] ?: return true
+        val fromTile = lastTask.getTileId()
+        val originShedTile = machine.getLocation()
+
+        fun pathToShed(from: Int, to: Int, withHarvest: Boolean): Boolean {
+            return try {
+                bfs.findPath(from, to, farm.getId(), withHarvest)
+            } catch (_: Exception) {
+                false
+            }
+        }
+
+        if (pathToShed(fromTile, originShedTile, true)) {
+            lastTask.setShedId(originShedTile)
+            logging.Logger.logFarmMachineFinishedToShed(machineId, originShedTile)
+            return true
+        }
+        val farmsteadsWithShed = farm.getFarmsteads()
+                                    .filter { it.value.getShed() }
+                                    .toSortedMap()
+
+        for (farmstead in farmsteadsWithShed.keys) {
+            if (farmstead == originShedTile) continue // skip OG farmstead
+            if (pathToShed(fromTile, farmstead, true)) {
+                lastTask.setShedId(farmstead)
+                machine.setLocation(farmstead)
+                logging.Logger.logFarmMachineFinishedToShed(machineId, farmstead)
+                return true
+            }
+        }
+
+        // if machine can not get to farmstead remove from machine list
+        logging.Logger.logFarmMachineFinishedNoReturn(machineId)
+        lastTask.setShedId(-1)
+        farm.getMachines().remove(machineId)
+        return false
+    }
 }
 
 ////STILL NEED TO ADD SHED LOGIC
