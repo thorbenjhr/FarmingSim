@@ -43,6 +43,8 @@ class IncidentManager(private val incidents: Map<Int, List<Incident>>) {
             meadow.getCoordinates().getNeighbours(2).mapNotNull { m.getTileByCoordinates(it) }.distinct()
         }
 
+        meadowTilesRadius.filter { it.getType() == TileType.FIELD || it.getType() == TileType.PLANTATION }
+
         meadowTilesRadius.forEach { t ->
             val spec = t.getPlant()?.getType()?.getSpec()
             val env = t.getEnvironment()
