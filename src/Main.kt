@@ -107,7 +107,7 @@ fun test2() {
 
     val im = IncidentManager(emptyMap())
     val f = Farm(5, "", mapOf(1 to t9),
-        mapOf(1 to t1, 6 to t6, 7 to t7, 13 to t13) as MutableMap<Int, Tile>, emptyMap(), emptyMap(), emptyMap())
+        mapOf(1 to t1, 6 to t6, 7 to t7, 13 to t13) as MutableMap<Int, Tile>, mutableMapOf(), mutableMapOf(), emptyMap())
     val farms = mapOf(
         5 to f
     )

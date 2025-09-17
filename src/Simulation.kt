@@ -47,7 +47,7 @@ class Simulation (private val m: MapClass, private val farms: Map<Int, Farm>, pr
     }
 
     private fun startAndEndIncidents() {
-        incidentManager.handleIncidents(currentTick, cm, m, farms)
+        incidentManager.handleIncidents(currentTick, yearTick, cm, m, farms)
     }
 
     private fun computeHarvestEstimate() {
