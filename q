@@ -1,0 +1,41 @@
+Johanna Meerjanssen (8):
+      started farm handler with sowing plans and targets
+      Merge remote-tracking branch 'origin/main'
+      added task priorities
+      ordering and assigning logic, I HATE NULL
+      removed task ids. detekt will def be a hater
+      added to shed logic. I have so many questions :(
+      idk anymore
+      added needAction(), but it sus, will go through again
+
+Thorben (13):
+      skeleton + some stuff
+      Sim done
+      fix moves in cm
+      getTileByIdAndDirection, adjust Coordinate and Direction
+      map done
+      add square check
+      reduceMoisture
+      drought incident
+      updte applydrought
+      animal attack exc mowing
+      update
+      add logging todo
+      fix to compile
+
+Thorben Johr (14):
+      update to constants
+      update setters
+      update estimate
+      machin
+      fix for temp run
+      update getters and setters2
+      update getters
+      getters setters
+      update
+      applycityexpansion
+      add ttc
+      dont worry, bee happy
+      dont worry, bee happy pt. 2
+      plant spec but not optimized and not completely filled out bc i dont want to
+

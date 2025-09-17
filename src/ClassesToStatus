@@ -9,7 +9,7 @@ Tile                        NeedsAction
 Coordinate                  DONE
 
 PACKAGE ENUMS
-PlantType                   Missing PlantSpec
+PlantType                   Missing PlantSpec -> NEEDS FIX!!!
 Action                      DONE
 Direction                   DONE
 TileType                    DONE
