@@ -363,5 +363,6 @@ class FarmHandler(private val bfs: Bfs) {
     }
 }
 
-////STILL NEED TO ADD SHED LOGIC
+////SHED LOGIC what happens if machine can't return log, set task id shed to -1, remove machine from farm, how remove harvest?
+/// do we log the harvest per harvesting of tile, how remove harvest if machine gets stuck
 ////FIX LOGGING
